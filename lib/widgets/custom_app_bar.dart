@@ -12,7 +12,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(
         title,
-        style: TextStyle(color: AppColor.blue),
+        style: TextStyle(
+          color: AppColor.lightPink,
+          letterSpacing: 1.0,
+        ),
       ),
       actions: actions,
       backgroundColor: AppColor.navy,

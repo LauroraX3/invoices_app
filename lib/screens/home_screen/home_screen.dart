@@ -11,10 +11,18 @@ import 'package:path/path.dart';
 import 'package:invoices_app/widgets/custom_dropdown_button.dart';
 import 'package:invoices_app/widgets/custom_form_field.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../../widgets/custom_bottom_navigation_bar.dart';
+
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -22,26 +30,39 @@ class HomeScreen extends StatelessWidget {
       create: (context) => HomeCubit(),
       child: Builder(builder: (context) {
         return Scaffold(
+          backgroundColor: AppColor.lightPink,
           appBar: CustomAppBar(
-            title: 'Dodawanie faktury',
+            title: _selectedIndex == 0 ? 'Dodawanie faktury' : 'Lista faktur',
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: IconButton(
-                    icon: const Icon(
-                      Icons.save_outlined,
-                    ),
-                    iconSize: 30,
-                    onPressed: () async {
-                      _formKey.currentState?.validate();
-                      if (_formKey.currentState!.validate()) {
-                        await context.read<HomeCubit>().saveData();
-                      }
-                    }),
-              ),
+              if (_selectedIndex == 0)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                      icon: const Icon(
+                        Icons.save_outlined,
+                      ),
+                      iconSize: 30,
+                      onPressed: () async {
+                        _formKey.currentState?.validate();
+                        if (_formKey.currentState!.validate()) {
+                          await context.read<HomeCubit>().saveData();
+                        }
+                      }),
+                ),
             ],
           ),
-          body: InvoiceForm(formKey: _formKey),
+          bottomNavigationBar: CustomBottomNavigationBar(
+            selectedIndex: _selectedIndex,
+            onSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+          ),
+          body: <Widget>[
+            InvoiceForm(formKey: _formKey),
+            Text("data")
+          ][_selectedIndex],
         );
       }),
     );

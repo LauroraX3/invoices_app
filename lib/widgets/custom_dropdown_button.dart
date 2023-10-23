@@ -28,6 +28,9 @@ class CustomDropdownButton extends StatelessWidget {
       }).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        floatingLabelStyle: TextStyle(color: AppColor.navy),
         labelText: labelText,
         labelStyle: const TextStyle(
           color: AppColor.blue,

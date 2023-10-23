@@ -59,6 +59,9 @@ class _CustomFormFieldState extends State<CustomFormField> {
       decoration: InputDecoration(
         labelText: widget.labelText,
         counterText: '',
+        filled: true,
+        fillColor: Colors.white,
+        floatingLabelStyle: TextStyle(color: AppColor.navy),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(
