@@ -8,10 +8,12 @@ class CustomDropdownButton extends StatelessWidget {
     super.key,
     required this.labelText,
     required this.items,
+    this.onChanged,
   });
 
   final List<String> items;
   final String labelText;
+  final void Function(String?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class CustomDropdownButton extends StatelessWidget {
           child: Text(value),
         );
       }).toList(),
-      onChanged: (b) {},
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: const TextStyle(
@@ -34,7 +36,7 @@ class CustomDropdownButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(
             width: 2,
-            color: AppColor.blue,
+            color: AppColor.navy,
           ),
         ),
         focusedBorder: OutlineInputBorder(

@@ -1,36 +1,63 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:invoices_app/style/app_color.dart';
 
-class CustomFormField extends StatelessWidget {
+class CustomFormField extends StatefulWidget {
   const CustomFormField({
     super.key,
     required this.labelText,
     this.maxLength = 1000,
     this.keyboardType,
     this.textCapitalization = TextCapitalization.none,
+    this.controller,
     this.onChanged,
+    this.onFocusChanged,
     this.validator,
     this.initialValue,
+    this.isEnabled = true,
+    this.onTap,
   });
 
   final String labelText;
   final int maxLength;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
+  final TextEditingController? controller;
   final void Function(String)? onChanged;
+  final void Function(bool hasFocus)? onFocusChanged;
   final String? Function(String?)? validator;
-
   final String? initialValue;
+  final bool isEnabled;
+  final void Function()? onTap;
+
+  @override
+  State<CustomFormField> createState() => _CustomFormFieldState();
+}
+
+class _CustomFormFieldState extends State<CustomFormField> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    if (widget.onFocusChanged != null) {
+      _focusNode.addListener(() => widget.onFocusChanged!(_focusNode.hasFocus));
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      maxLength: maxLength,
-      keyboardType: keyboardType,
-      textCapitalization: textCapitalization,
+      controller: widget.controller,
+      focusNode: _focusNode,
+      maxLength: widget.maxLength,
+      keyboardType: widget.keyboardType,
+      textCapitalization: widget.textCapitalization,
       decoration: InputDecoration(
-        labelText: labelText,
+        labelText: widget.labelText,
         counterText: '',
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
@@ -46,18 +73,41 @@ class CustomFormField extends StatelessWidget {
             color: AppColor.darkPink,
           ),
         ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(
+            width: 2,
+            color: AppColor.navy,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(
+            width: 2,
+            color: Colors.red,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(
+            width: 2,
+            color: Colors.red,
+          ),
+        ),
         labelStyle: const TextStyle(
           color: AppColor.blue,
         ),
       ),
       style: TextStyle(color: AppColor.blue, fontSize: 18),
-      onChanged: onChanged,
-      validator: validator,
+      onChanged: widget.onChanged,
+      validator: widget.validator,
       inputFormatters: [
-        if (keyboardType == TextInputType.number)
+        if (widget.keyboardType == TextInputType.number)
           FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
       ],
-      initialValue: initialValue,
+      initialValue: widget.initialValue,
+      enabled: widget.isEnabled,
+      onTap: widget.onTap,
     );
   }
 }

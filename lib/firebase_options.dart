@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:469622118306:android:4b1161e5ccf1b732d4c4fb',
     messagingSenderId: '469622118306',
     projectId: 'invoices-app-7a59c',
+    databaseURL: 'https://invoices-app-7a59c-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'invoices-app-7a59c.appspot.com',
   );
 
@@ -62,6 +63,7 @@ class DefaultFirebaseOptions {
     appId: '1:469622118306:ios:0f8ac028b7b49f01d4c4fb',
     messagingSenderId: '469622118306',
     projectId: 'invoices-app-7a59c',
+    databaseURL: 'https://invoices-app-7a59c-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'invoices-app-7a59c.appspot.com',
     iosBundleId: 'com.example.invoicesApp',
   );

@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:invoices_app/firebase_options.dart';
-import 'package:invoices_app/screens/home_screen.dart';
+import 'package:invoices_app/screens/home_screen/home_screen.dart';
 import 'package:invoices_app/widgets/custom_form_field.dart';
 
 Future<void> main() async {
