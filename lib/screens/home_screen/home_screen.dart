@@ -12,6 +12,7 @@ import 'package:invoices_app/widgets/custom_dropdown_button.dart';
 import 'package:invoices_app/widgets/custom_form_field.dart';
 
 import '../../widgets/custom_bottom_navigation_bar.dart';
+import '../invoices_list_screen/invoices_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -61,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           body: <Widget>[
             InvoiceForm(formKey: _formKey),
-            Text("data")
+            InvoicesListScreen(),
           ][_selectedIndex],
         );
       }),
@@ -93,7 +94,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
     var name = '';
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
       child: BlocListener<HomeCubit, HomeState>(
         listener: (_, state) {
           if (_grossNumberController.text != state.grossAmount) {

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:invoices_app/models/invoice.dart';
 import 'package:path/path.dart';
 
 part 'home_state.dart';
@@ -51,13 +52,13 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> saveData() async {
     DatabaseReference ref = FirebaseDatabase.instance.ref('invoices');
 
-    final invoice = {
-      "invoice_number": state.invoiceNumber,
-      "contractors_name": state.contractorsName,
-      "net_amount": state.netAmount,
-      "vat_rate": state.vatRate,
-      "gross_amount": state.grossAmount,
-    };
+    Invoice invoice = Invoice(
+      invoiceNumber: state.invoiceNumber,
+      contractorsName: state.contractorsName,
+      netAmount: state.netAmount,
+      vatRate: state.vatRate,
+      grossAmount: state.grossAmount,
+    );
 
     if (state.attachment != null) {
       final bytes = state.attachment!.readAsBytesSync();
@@ -66,15 +67,14 @@ class HomeCubit extends Cubit<HomeState> {
       final attachmentExt =
           attachmentName.substring(attachmentName.indexOf('.'));
 
-      invoice.addAll({
-        "attachment": attachment,
-        "attachment_name": attachmentName,
-        "attachment_ext": attachmentExt,
-      });
+      invoice = invoice.copyWith(
+        attachment: attachment,
+        attachmentName: attachmentName,
+        attachmentExt: attachmentExt,
+      );
     }
 
-    await ref.set(invoice);
-
-    print("state.invoiceNumber");
+    final pushedRef = ref.push();
+    await pushedRef.set(invoice.copyWith(id: pushedRef.key).toJson());
   }
 }

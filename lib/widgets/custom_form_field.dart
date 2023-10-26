@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:invoices_app/style/app_color.dart';
@@ -18,6 +16,7 @@ class CustomFormField extends StatefulWidget {
     this.initialValue,
     this.isEnabled = true,
     this.onTap,
+    this.sufixIcon,
   });
 
   final String labelText;
@@ -32,6 +31,8 @@ class CustomFormField extends StatefulWidget {
   final bool isEnabled;
   final void Function()? onTap;
 
+  final Widget? sufixIcon;
+
   @override
   State<CustomFormField> createState() => _CustomFormFieldState();
 }
@@ -41,6 +42,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
 
   @override
   void initState() {
+    _focusNode.addListener(() => setState(() {}));
     if (widget.onFocusChanged != null) {
       _focusNode.addListener(() => widget.onFocusChanged!(_focusNode.hasFocus));
     }
@@ -61,6 +63,8 @@ class _CustomFormFieldState extends State<CustomFormField> {
         counterText: '',
         filled: true,
         fillColor: Colors.white,
+        suffixIcon: widget.sufixIcon,
+        suffixIconColor: _focusNode.hasFocus ? AppColor.navy : AppColor.blue,
         floatingLabelStyle: TextStyle(color: AppColor.navy),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
