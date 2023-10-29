@@ -10,18 +10,26 @@ class InvoicesListCubit extends Cubit<InvoicesListState> {
 
   List<Invoice> _invoices = [];
 
+  void _loadInvoices(Map<Object?, Object?> map) {
+    final invoicesMap = map.values.cast<Map<Object?, Object?>>().toList();
+    final jsonList = invoicesMap.map((e) => e.cast<String, dynamic>()).toList();
+
+    _invoices = Invoice.fromJsonList(jsonList);
+    emit(state.copyWith(invoices: Invoice.fromJsonList(jsonList)));
+  }
+
   Future<void> init() async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref('invoices');
+    DatabaseReference ref = FirebaseDatabase.instance.ref();
 
-    final snapshot = await ref.get();
+    ref.onChildChanged.listen((event) {
+      if (event.snapshot.exists) {
+        _loadInvoices(event.snapshot.value as Map<Object?, Object?>);
+      }
+    });
+
+    final snapshot = await ref.child('invoices').get();
     if (snapshot.exists) {
-      final map = snapshot.value as Map<Object?, Object?>;
-      final invoicesMap = map.values.cast<Map<Object?, Object?>>().toList();
-      final jsonList =
-          invoicesMap.map((e) => e.cast<String, dynamic>()).toList();
-
-      _invoices = Invoice.fromJsonList(jsonList);
-      emit(state.copyWith(invoices: Invoice.fromJsonList(jsonList)));
+      _loadInvoices(snapshot.value as Map<Object?, Object?>);
     } else {
       print('No data available.');
     }

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:equatable/equatable.dart';
 
 class Invoice extends Equatable {
@@ -16,9 +18,9 @@ class Invoice extends Equatable {
   final String id;
   final String invoiceNumber;
   final String contractorsName;
-  final String netAmount;
-  final String vatRate;
-  final String grossAmount;
+  final double netAmount;
+  final int vatRate;
+  final double grossAmount;
   final String? attachment;
   final String? attachmentName;
   final String? attachmentExt;
@@ -28,9 +30,9 @@ class Invoice extends Equatable {
       id: json['id'] as String,
       invoiceNumber: json['invoiceNumber'] as String,
       contractorsName: json['contractorsName'] as String,
-      netAmount: json['netAmount'] as String,
-      vatRate: json['vatRate'] as String,
-      grossAmount: json['grossAmount'] as String,
+      netAmount: double.parse(json['netAmount'].toString()),
+      vatRate: json['vatRate'] as int,
+      grossAmount: double.parse(json['grossAmount'].toString()),
       attachment: json['attachment'] as String?,
       attachmentName: json['attachmentName'] as String?,
       attachmentExt: json['attachmentExt'] as String?,
@@ -47,7 +49,7 @@ class Invoice extends Equatable {
         'contractorsName': contractorsName,
         'netAmount': netAmount,
         'vatRate': vatRate,
-        'grossAmount': grossAmount,
+        'grossAmount': double.parse(grossAmount.toStringAsFixed(2)),
         'attachment': attachment,
         'attachmentName': attachmentName,
         'attachmentExt': attachmentExt,
@@ -57,9 +59,9 @@ class Invoice extends Equatable {
     String? id,
     String? invoiceNumber,
     String? contractorsName,
-    String? netAmount,
-    String? vatRate,
-    String? grossAmount,
+    double? netAmount,
+    int? vatRate,
+    double? grossAmount,
     String? attachment,
     String? attachmentName,
     String? attachmentExt,
@@ -76,6 +78,9 @@ class Invoice extends Equatable {
       attachmentExt: attachmentExt ?? this.attachmentExt,
     );
   }
+
+  bool get isAttachmentExists =>
+      attachment != null && attachmentName != null && attachmentExt != null;
 
   @override
   List<Object?> get props => [

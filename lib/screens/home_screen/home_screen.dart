@@ -7,23 +7,13 @@ import 'package:invoices_app/screens/home_screen/cubit/home_cubit.dart';
 import 'package:invoices_app/style/app_color.dart';
 import 'package:invoices_app/widgets/custom_app_bar.dart';
 import 'package:path/path.dart';
-
 import 'package:invoices_app/widgets/custom_dropdown_button.dart';
 import 'package:invoices_app/widgets/custom_form_field.dart';
 
-import '../../widgets/custom_bottom_navigation_bar.dart';
-import '../invoices_list_screen/invoices_list_screen.dart';
-
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -33,37 +23,25 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           backgroundColor: AppColor.lightPink,
           appBar: CustomAppBar(
-            title: _selectedIndex == 0 ? 'Dodawanie faktury' : 'Lista faktur',
+            title: 'Dodawanie faktury',
             actions: [
-              if (_selectedIndex == 0)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: IconButton(
-                      icon: const Icon(
-                        Icons.save_outlined,
-                      ),
-                      iconSize: 30,
-                      onPressed: () async {
-                        _formKey.currentState?.validate();
-                        if (_formKey.currentState!.validate()) {
-                          await context.read<HomeCubit>().saveData();
-                        }
-                      }),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                    icon: const Icon(
+                      Icons.save_outlined,
+                    ),
+                    iconSize: 30,
+                    onPressed: () async {
+                      _formKey.currentState?.validate();
+                      if (_formKey.currentState!.validate()) {
+                        await context.read<HomeCubit>().saveData();
+                      }
+                    }),
+              ),
             ],
           ),
-          bottomNavigationBar: CustomBottomNavigationBar(
-            selectedIndex: _selectedIndex,
-            onSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
-          body: <Widget>[
-            InvoiceForm(formKey: _formKey),
-            InvoicesListScreen(),
-          ][_selectedIndex],
+          body: InvoiceForm(formKey: _formKey),
         );
       }),
     );
@@ -71,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class InvoiceForm extends StatefulWidget {
-  InvoiceForm({required this.formKey});
+  const InvoiceForm({super.key, required this.formKey});
 
   final GlobalKey<FormState> formKey;
   @override
@@ -79,9 +57,13 @@ class InvoiceForm extends StatefulWidget {
 }
 
 class _InvoiceFormState extends State<InvoiceForm> {
-  final TextEditingController _grossNumberController = TextEditingController();
-  final TextEditingController _netNumberController =
-      TextEditingController(text: '0.00');
+  final _invoiceNumberController = TextEditingController();
+  final _contractorsNameController = TextEditingController();
+
+  final _netNumberController = TextEditingController(text: '0.00');
+
+  final _vatRateKey = GlobalKey<FormFieldState>();
+  final _grossNumberController = TextEditingController(text: '0.00');
 
   void clearText() {
     if (_netNumberController.text == '0.00') {
@@ -89,16 +71,31 @@ class _InvoiceFormState extends State<InvoiceForm> {
     }
   }
 
+  void _clearForm() {
+    _invoiceNumberController.text = '';
+    _contractorsNameController.text = '';
+    _netNumberController.text = '0.00';
+    _vatRateKey.currentState?.didChange('0%');
+    _grossNumberController.text = '0.00';
+  }
+
   @override
   Widget build(BuildContext context) {
-    var name = '';
-
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15, horizontal: 8),
       child: BlocListener<HomeCubit, HomeState>(
         listener: (_, state) {
           if (_grossNumberController.text != state.grossAmount) {
-            _grossNumberController.text = state.grossAmount;
+            _grossNumberController.text = state.grossAmount.toStringAsFixed(2);
+          }
+
+          if (state.isDataSent ?? false) {
+            _clearForm();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Zapisano fakturę'),
+              ),
+            );
           }
         },
         child: Form(
@@ -109,6 +106,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                 labelText: 'Nr faktury',
                 textCapitalization: TextCapitalization.sentences,
                 maxLength: 50,
+                controller: _invoiceNumberController,
                 onChanged: (value) =>
                     context.read<HomeCubit>().onChangeInvoiceNumber(value),
                 validator: (value) {
@@ -129,6 +127,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
                 labelText: 'Nazwa kontrahenta',
                 textCapitalization: TextCapitalization.sentences,
                 maxLength: 100,
+                controller: _contractorsNameController,
                 onChanged: (value) =>
                     context.read<HomeCubit>().onChangeContractorsName(value),
                 validator: (value) {
@@ -169,6 +168,7 @@ class _InvoiceFormState extends State<InvoiceForm> {
               CustomDropdownButton(
                 labelText: 'Stawka VAT',
                 items: <String>['0%', '7%', '23%'],
+                dropdownStateKey: _vatRateKey,
                 onChanged: (value) {
                   if (value != null) {
                     context.read<HomeCubit>().onChangeVatRate(value);

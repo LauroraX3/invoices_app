@@ -8,16 +8,20 @@ class CustomDropdownButton extends StatelessWidget {
     super.key,
     required this.labelText,
     required this.items,
+    this.dropdownStateKey,
     this.onChanged,
   });
 
   final List<String> items;
   final String labelText;
+
+  final GlobalKey<FormFieldState>? dropdownStateKey;
   final void Function(String?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
+      key: dropdownStateKey,
       value: items.first,
       icon: const Icon(Icons.arrow_drop_down),
       items: items.map<DropdownMenuItem<String>>((String value) {
